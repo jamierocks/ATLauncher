@@ -20,4 +20,6 @@ public abstract class AbstractSettingsTab extends JPanel {
         super(new GridBagLayout());
         this.gbc = new GridBagConstraints();
     }
+
+    public abstract boolean needsRelaunch();
 }
