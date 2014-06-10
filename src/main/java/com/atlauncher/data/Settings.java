@@ -48,6 +48,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import com.atlauncher.adapter.ColorTypeAdapter;
+import com.atlauncher.gui.tabs.InstancesTab;
+import com.atlauncher.gui.tabs.NewsTab;
+import com.atlauncher.gui.tabs.PacksTab;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -64,9 +67,6 @@ import com.atlauncher.gui.LauncherBottomBar;
 import com.atlauncher.gui.LauncherConsole;
 import com.atlauncher.gui.ProgressDialog;
 import com.atlauncher.gui.TrayMenu;
-import com.atlauncher.gui.tabs.InstancesTab;
-import com.atlauncher.gui.tabs.NewsTab;
-import com.atlauncher.gui.tabs.PacksTab;
 import com.atlauncher.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -1861,7 +1861,7 @@ public class Settings {
      */
     public void reloadInstancesPanel() {
         if (instancesPanel != null) {
-            this.instancesPanel.reload(); // Reload the instances panel
+            // this.instancesPanel.reload(); // Reload the instances panel
         }
     }
 
@@ -1887,7 +1887,7 @@ public class Settings {
      * Reloads the panel used for News
      */
     public void reloadNewsPanel() {
-        this.newsPanel.reload(); // Reload the news panel
+        this.newsPanel.load(); // Reload the news panel
     }
 
     /**
