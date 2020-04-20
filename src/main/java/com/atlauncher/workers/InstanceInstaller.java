@@ -17,6 +17,8 @@
  */
 package com.atlauncher.workers;
 
+import static com.atlauncher.data.Constants.FTB_META_CLIENT;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -107,7 +109,6 @@ public class InstanceInstaller extends SwingWorker<Boolean, Void> implements Net
     public LoaderVersion loaderVersion;
     public final CurseManifest curseManifest;
     public final Pack ftbPack;
-    public final org.neptunepowered.ftb.meta.Version ftbVersion;
     public final File manifestFile;
 
     public boolean isReinstall;
@@ -140,7 +141,7 @@ public class InstanceInstaller extends SwingWorker<Boolean, Void> implements Net
 
     public InstanceInstaller(String name, com.atlauncher.data.Pack pack, com.atlauncher.data.PackVersion version,
             boolean isReinstall, boolean isServer, String shareCode, boolean showModsChooser,
-            LoaderVersion loaderVersion, CurseManifest curseManifest, File manifestFile) {
+            LoaderVersion loaderVersion, CurseManifest curseManifest, Pack ftbPack, File manifestFile) {
         this.name = name;
         this.pack = pack;
         this.version = version;
@@ -159,6 +160,7 @@ public class InstanceInstaller extends SwingWorker<Boolean, Void> implements Net
 
         this.loaderVersion = loaderVersion;
         this.curseManifest = curseManifest;
+        this.ftbPack = ftbPack;
         this.manifestFile = manifestFile;
     }
 
@@ -180,10 +182,17 @@ public class InstanceInstaller extends SwingWorker<Boolean, Void> implements Net
         }
 
         try {
-            if (curseManifest == null) {
-                downloadPackVersionJson();
-            } else {
+            // Download Curse pack
+            if (curseManifest != null) {
                 generatePackVersionFromCurse();
+            }
+            // Download FTB pack
+            else if (this.ftbPack != null) {
+                generatePackVersionFromFTB();
+            }
+            // Download ATL pack
+            else {
+                downloadPackVersionJson();
             }
 
             downloadMinecraftVersionJson();
@@ -301,6 +310,28 @@ public class InstanceInstaller extends SwingWorker<Boolean, Void> implements Net
 
             return mod;
         }).collect(Collectors.toList());
+
+        hideSubProgressBar();
+    }
+
+    private void generatePackVersionFromFTB() throws Exception {
+        this.addPercent(5);
+        this.fireTask(GetText.tr("Generating Pack Version Definition From FTB"));
+        this.fireSubProgressUnknown();
+
+        // Fetch Version from Neptune FTB Meta Service
+        final org.neptunepowered.ftb.meta.Version version = FTB_META_CLIENT.getVersion(
+            this.ftbPack.getSlug(), this.version.version.replace('.', '-')
+        );
+
+        // Create ATL Version
+        this.packVersion = new Version();
+        this.packVersion.version = this.version.version;
+        this.packVersion.minecraft = this.version.minecraftVersion.version;
+
+        // todo: finish
+
+        this.packVersion.compileColours();
 
         hideSubProgressBar();
     }

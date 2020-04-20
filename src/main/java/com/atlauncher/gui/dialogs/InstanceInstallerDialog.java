@@ -17,6 +17,8 @@
  */
 package com.atlauncher.gui.dialogs;
 
+import static com.atlauncher.data.Constants.FTB_META_CLIENT;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -83,7 +85,6 @@ public class InstanceInstallerDialog extends JDialog {
     private Instance instance = null;
     private InstanceV2 instanceV2 = null;
     private CurseManifest curseManifest = null;
-    private final FTBMetaClient ftbMetaClient = new FTBMetaClient();
     private org.neptunepowered.ftb.meta.Pack ftbPack = null;
 
     private JPanel top;
@@ -197,7 +198,7 @@ public class InstanceInstallerDialog extends JDialog {
             for (final VersionInfo versionInfo : this.ftbPack.getVersions()) {
                 try {
                     final org.neptunepowered.ftb.meta.Version fullVersion =
-                        this.ftbMetaClient.getVersion(this.ftbPack.getSlug(), versionInfo.getSlug());
+                        FTB_META_CLIENT.getVersion(this.ftbPack.getSlug(), versionInfo.getSlug());
 
                     final PackVersion version = new PackVersion();
                     version.version = versionInfo.getName();
