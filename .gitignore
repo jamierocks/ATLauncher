@@ -9,6 +9,8 @@ testLauncher/
 
 # Files
 .idea/
+out/
+run/
 .classpath
 .project
 

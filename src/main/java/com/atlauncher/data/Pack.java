@@ -49,6 +49,7 @@ public class Pack {
     public boolean hasDiscordImage;
     public String description;
     public CurseMod cursePack;
+    public org.neptunepowered.ftb.meta.Pack ftbPack;
     public String discordInviteURL = null;
     public String supportURL = null;
     public String websiteURL = null;

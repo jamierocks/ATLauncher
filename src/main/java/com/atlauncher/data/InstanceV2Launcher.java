@@ -43,6 +43,7 @@ public class InstanceV2Launcher {
     public Java java;
 
     public boolean enableCurseIntegration = false;
+    public boolean enableFtbIntegration = false;
     public boolean enableEditingMods = true;
 
     public LoaderVersion loaderVersion;

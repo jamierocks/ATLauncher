@@ -77,6 +77,7 @@ public class InstanceInstallerDialog extends JDialog {
     private Instance instance = null;
     private InstanceV2 instanceV2 = null;
     private CurseManifest curseManifest = null;
+    private org.neptunepowered.ftb.meta.Pack ftbPack = null;
 
     private JPanel top;
     private JPanel middle;
@@ -173,6 +174,15 @@ public class InstanceInstallerDialog extends JDialog {
 
             // #. {0} is the name of the pack the user is installing from Curse
             setTitle(GetText.tr("Installing {0} From Curse", curseManifest.name));
+        } else if (object instanceof org.neptunepowered.ftb.meta.Pack) {
+            this.ftbPack = (org.neptunepowered.ftb.meta.Pack) object;
+
+            // Notes:
+            // - We use 15,000 to give FTB packs a unique identifier
+            this.pack = new Pack();
+            this.pack.id = 15_000 + this.ftbPack.getId();
+            this.pack.name = this.ftbPack.getName();
+            this.pack.description = this.ftbPack.getDescription();
         } else {
             instanceV2 = (InstanceV2) object;
             pack = instanceV2.getPack();
