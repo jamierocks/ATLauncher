@@ -17,6 +17,10 @@
  */
 package com.atlauncher.utils;
 
+import com.atlauncher.exceptions.FaultyFtbVersion;
+import org.neptunepowered.ftb.meta.Version;
+import org.neptunepowered.ftb.meta.VersionTarget;
+
 /**
  * Utilities for working with modpacks from Feed The Beast.
  * <p>
@@ -26,6 +30,16 @@ package com.atlauncher.utils;
  * @author Jamie Mansfield
  */
 public final class FtbPackUtils {
+
+    public static String getMinecraftVersion(final Version version) throws FaultyFtbVersion {
+        for (final VersionTarget target : version.getTargets()) {
+            if ("game".equals(target.getType())) {
+                return target.getVersion();
+            }
+        }
+
+        throw new FaultyFtbVersion(version.getName() + " has no Minecraft version!");
+    }
 
     private FtbPackUtils() {
     }

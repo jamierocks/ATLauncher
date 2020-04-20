@@ -32,6 +32,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,14 +59,19 @@ import com.atlauncher.data.curse.CurseMod;
 import com.atlauncher.data.curse.pack.CurseManifest;
 import com.atlauncher.data.json.Version;
 import com.atlauncher.data.minecraft.loaders.LoaderVersion;
+import com.atlauncher.exceptions.FaultyFtbVersion;
 import com.atlauncher.exceptions.InvalidMinecraftVersion;
 import com.atlauncher.managers.DialogManager;
 import com.atlauncher.network.Analytics;
 import com.atlauncher.utils.CurseApi;
+import com.atlauncher.utils.FtbPackUtils;
+import com.atlauncher.utils.MojangAPIUtils;
 import com.atlauncher.utils.Utils;
 import com.atlauncher.workers.InstanceInstaller;
 
 import org.mini2Dx.gettext.GetText;
+import org.neptunepowered.ftb.meta.VersionInfo;
+import org.neptunepowered.ftb.meta.client.FTBMetaClient;
 
 public class InstanceInstallerDialog extends JDialog {
     private static final long serialVersionUID = -6984886874482721558L;
@@ -77,6 +83,7 @@ public class InstanceInstallerDialog extends JDialog {
     private Instance instance = null;
     private InstanceV2 instanceV2 = null;
     private CurseManifest curseManifest = null;
+    private final FTBMetaClient ftbMetaClient = new FTBMetaClient();
     private org.neptunepowered.ftb.meta.Pack ftbPack = null;
 
     private JPanel top;
@@ -180,9 +187,29 @@ public class InstanceInstallerDialog extends JDialog {
             // Notes:
             // - We use 15,000 to give FTB packs a unique identifier
             this.pack = new Pack();
+            this.pack.ftbPack = this.ftbPack;
             this.pack.id = 15_000 + this.ftbPack.getId();
             this.pack.name = this.ftbPack.getName();
             this.pack.description = this.ftbPack.getDescription();
+
+            // Populate versions
+            this.versions = new ArrayList<>();
+            for (final VersionInfo versionInfo : this.ftbPack.getVersions()) {
+                try {
+                    final org.neptunepowered.ftb.meta.Version fullVersion =
+                        this.ftbMetaClient.getVersion(this.ftbPack.getSlug(), versionInfo.getSlug());
+
+                    final PackVersion version = new PackVersion();
+                    version.version = versionInfo.getName();
+                    version.minecraftVersion = App.settings.getMinecraftVersion(FtbPackUtils.getMinecraftVersion(fullVersion));
+
+                    this.versions.add(version);
+                }
+                catch (final IOException | FaultyFtbVersion | InvalidMinecraftVersion e) {
+                    LogManager.error(e.getMessage());
+                    return;
+                }
+            }
         } else {
             instanceV2 = (InstanceV2) object;
             pack = instanceV2.getPack();

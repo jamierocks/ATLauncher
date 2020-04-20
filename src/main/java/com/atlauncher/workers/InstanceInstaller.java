@@ -85,6 +85,8 @@ import com.atlauncher.utils.walker.CaseFileVisitor;
 import com.google.gson.reflect.TypeToken;
 
 import org.mini2Dx.gettext.GetText;
+import org.neptunepowered.ftb.meta.Art;
+import org.neptunepowered.ftb.meta.Pack;
 import org.zeroturnaround.zip.ZipUtil;
 
 import okhttp3.OkHttpClient;
@@ -104,6 +106,8 @@ public class InstanceInstaller extends SwingWorker<Boolean, Void> implements Net
     public final boolean showModsChooser;
     public LoaderVersion loaderVersion;
     public final CurseManifest curseManifest;
+    public final Pack ftbPack;
+    public final org.neptunepowered.ftb.meta.Version ftbVersion;
     public final File manifestFile;
 
     public boolean isReinstall;
@@ -1160,22 +1164,37 @@ public class InstanceInstaller extends SwingWorker<Boolean, Void> implements Net
     private void downloadInstanceImage() throws Exception {
         addPercent(5);
 
-        if (curseManifest == null || this.pack.cursePack == null) {
-            return;
-        }
+        // Download Curse image
+        if (this.curseManifest != null && this.pack.cursePack != null) {
+            fireTask(GetText.tr("Downloading Instance Image"));
 
-        fireTask(GetText.tr("Downloading Instance Image"));
-
-        CurseAttachment attachment = this.pack.cursePack.attachments.stream().filter(a -> a.isDefault).findFirst()
+            CurseAttachment attachment = this.pack.cursePack.attachments.stream().filter(a -> a.isDefault).findFirst()
                 .orElse(null);
 
-        if (attachment != null) {
-            com.atlauncher.network.Download imageDownload = com.atlauncher.network.Download.build()
+            if (attachment != null) {
+                com.atlauncher.network.Download imageDownload = com.atlauncher.network.Download.build()
                     .setUrl(attachment.url).downloadTo(root.resolve("instance.png")).withInstanceInstaller(this)
                     .withHttpClient(Network.createProgressClient(this));
 
-            this.setTotalBytes(imageDownload.getFilesize());
-            imageDownload.downloadFile();
+                this.setTotalBytes(imageDownload.getFilesize());
+                imageDownload.downloadFile();
+            }
+        }
+
+        // Download FTB image
+        if (this.ftbPack != null && this.pack.ftbPack != null) {
+            fireTask(GetText.tr("Downloading Instance Image"));
+
+            final Art art = this.pack.ftbPack.getArt().get("square");
+
+            if (art != null) {
+                final com.atlauncher.network.Download imageDownload = com.atlauncher.network.Download.build()
+                    .setUrl(art.getUrl()).downloadTo(this.root.resolve("instance.png")).withInstanceInstaller(this)
+                    .withHttpClient(Network.createProgressClient(this));
+
+                this.setTotalBytes(imageDownload.getFilesize());
+                imageDownload.downloadFile();
+            }
         }
     }
 
